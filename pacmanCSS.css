@@ -1,0 +1,220 @@
+/*mobile phones*/
+[class*="col-"] {
+	width: 100%;
+}
+
+@media only screen and (min-width: 768px){
+	.col-1 {width: 8.33%;}
+	.col-2 {width: 16.66%;}
+	.col-3 {width: 25%;}
+	.col-4 {width: 33.33%;}
+	.col-5 {width: 41.66%;}
+	.col-6 {width: 50%;}
+	.col-7 {width: 58.33%;}
+	.col-8 {width: 66.66%;}
+	.col-9 {width: 75%;}
+	.col-10 {width: 83.33%;}
+	.col-11 {width: 91.66%;}
+	.col-12 {width: 100%;}
+}
+
+body {
+	font-family: Arial, sans-serif;
+	font-size: 30px;
+	position:relative;
+	background:#4A5F3E;
+	height:80%;
+	padding:40px 30%;
+	margin:0;
+}
+
+.sprite {
+    background-image: url(spritesheet.png);
+    background-repeat: no-repeat;
+    display: inline-block;
+    margin: 0px;
+    padding: 0px;
+    float: left;
+}
+
+.sprite-BTY {
+    width: 24px;
+    height: 24px;
+    background-position: -5px -5px;
+}
+
+.sprite-CHBar {
+    width: 24px;
+    height: 24px;
+    background-position: -39px -5px;
+}
+
+.sprite-CVBar {
+    width: 24px;
+    height: 24px;
+    background-position: -73px -5px;
+}
+
+.sprite-GBBar {
+    width: 24px;
+    height: 24px;
+    background-position: -107px -5px;
+}
+
+.sprite-GBLC {
+    width: 24px;
+    height: 24px;
+    background-position: -5px -39px;
+}
+
+.sprite-GBRC {
+    width: 24px;
+    height: 24px;
+    background-position: -39px -39px;
+}
+
+.sprite-GLBar {
+    width: 24px;
+    height: 24px;
+    background-position: -73px -39px;
+}
+
+.sprite-GRBar {
+    width: 24px;
+    height: 24px;
+    background-position: -107px -39px;
+}
+
+.sprite-GTBar {
+    width: 24px;
+    height: 24px;
+    background-position: -5px -73px;
+}
+
+.sprite-GTLC {
+    width: 24px;
+    height: 24px;
+    background-position: -39px -73px;
+}
+
+.sprite-GTRC {
+    width: 24px;
+    height: 24px;
+    background-position: -73px -73px;
+}
+
+.sprite-HLCap {
+    width: 24px;
+    height: 24px;
+    background-position: -107px -73px;
+}
+
+.sprite-HRCap {
+    width: 24px;
+    height: 24px;
+    background-position: -5px -107px;
+}
+
+.sprite-LTY {
+    width: 24px;
+    height: 24px;
+    background-position: -39px -107px;
+}
+
+.sprite-NBLC {
+    width: 24px;
+    height: 24px;
+    background-position: -73px -107px;
+}
+
+.sprite-NBRC {
+    width: 24px;
+    height: 24px;
+    background-position: -107px -107px;
+}
+
+.sprite-NTLC {
+    width: 24px;
+    height: 24px;
+    background-position: -141px -5px;
+}
+
+.sprite-NTRC {
+    width: 24px;
+    height: 24px;
+    background-position: -141px -39px;
+}
+
+.sprite-RTY {
+    width: 24px;
+    height: 24px;
+    background-position: -141px -73px;
+}
+
+.sprite-TTY {
+    width: 24px;
+    height: 24px;
+    background-position: -141px -107px;
+}
+
+.sprite-VBCap {
+    width: 24px;
+    height: 24px;
+    background-position: -5px -141px;
+}
+
+.sprite-VTCap {
+    width: 23px;
+    height: 24px;
+    background-position: -39px -141px;
+}
+
+.sprite-substitute {
+    width: 24px;
+    height: 24px;
+    background-position: -72px -141px;
+}
+
+
+#wrap {
+	width: 40vh;
+	height: 40vh;
+}
+
+.right {
+    position: absolute;
+    right: 0px;
+    top: 0px;
+    width: 200px;
+    height: 200px;
+	background: #445739;
+	border: 2px solid #000000;
+	text-align: center;
+}
+
+.grey {
+	color: #D1D3CF;
+	text-shadow: -1px 0 black, 0 1px black;
+	padding: 0px;
+	margin: 0px;
+}
+
+.red {
+	color: #008000;
+	text-shadow: -1px 0 black, 0 1px black;
+	padding: 0px;
+	margin: 0px;
+}
+
+canvas {
+	background: #000000;
+	position: absolute;
+	top: 0;
+	bottom: 0;
+	left: 0;
+	right: 0;
+	width: 456px;
+	height: 504px;
+	border: 2px solid #000000;
+
+}

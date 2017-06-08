@@ -1,0 +1,35 @@
+<html>
+<head>
+	<link rel="stylesheet" href="./pacmanCSS.css">
+<body>
+	<canvas id="canvas" width="456" height="504">
+	<canvas>Your browser doesn't support canvas</canvas>
+	</canvas>
+	<div class="right">
+		<p class="grey">
+		Pacman
+		</p>
+		<button type="button" id="Play" onclick="pacman.game.begin()">Play</button>
+		<button type="button" id="Restart" onclick="pacman.game.restart()">Restart</button>
+		</p>
+		<p class="grey">
+			Score: 
+			<span id="scoreboard">0</span>
+		</p>
+		<p class="grey">
+			Highscore: 
+			<span id="highScore">0</span>
+		</p>
+		<p class="red">
+			<span id="lost"></span>
+		</p>
+	</div>
+</body>
+	<script src="mazeDrawer.js"></script>
+	<script src="pacmanGhosts.js"></script>
+	<script src="pacmanDrawer.js"></script>
+	<script src="pacmanJS.js"></script>
+</head>
+</html>
+
+<!-- pw for stars thing XjhIkl$#28cD -->
