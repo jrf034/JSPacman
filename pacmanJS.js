@@ -46,11 +46,11 @@ window.onload = function(){
 		var newHighscore = false;
 		var moving = true;
 		
+		var player = new Player(finePOS[X], finePOS[Y], POS[X], POS[Y], pacmanFrame, OLD_DIRECTION["name"]);
 		var blinky = new Ghost(9, 7, false, "red", 1, "up");
 		var inky = new Ghost(8, 9, false, "blue", 1, "right");
 		var pinky = new Ghost(9, 9, false, "pink", 1, "up");
 		var clyde = new Ghost(10, 9, false, "orange", 1, "left");
-		var player = new Player(finePOS[X], finePOS[Y], POS[X], POS[Y], pacmanFrame, OLD_DIRECTION["name"]);
 
 		var ghostArray = [blinky, inky, pinky, clyde];
 
@@ -68,7 +68,9 @@ window.onload = function(){
 				movePacman();
 			}
 
-			if (move % 5 == 0) {
+			var ghostSpeed = 5;
+
+			if (move % ghostSpeed == 0) {
 				updateGhosts();
 			}
 
@@ -78,7 +80,7 @@ window.onload = function(){
 
 			updateScore();
 			for (var name in ghostArray) {
-				var test = ghostArray[name].updateFinePos(finePOS[X], finePOS[Y]);
+				var test = ghostArray[name].updateFinePos(finePOS[X], finePOS[Y], ghostSpeed);
 				if (test) {
 					gameOver();
 				}
@@ -106,7 +108,7 @@ window.onload = function(){
 				if (move % 3 == 0) {
 					ghostArray[name].updateInformation();
 				}
-				var test = ghostArray[name].moveGhosts();
+				ghostArray[name].moveGhosts(POS[X], POS[Y]);
 			}
 		}
 
