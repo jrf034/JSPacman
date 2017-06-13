@@ -85,6 +85,12 @@ window.onload = function(){
 					gameOver();
 				}
 				ghostArray[name].drawGhosts(ctx);
+				if (player.isEating > 0) {
+					player.isEating -= 1;
+					ghostArray[name].isEdible = true;
+				} else {
+					ghostArray[name].isEdible = false;
+				}
 			}
 
 			move++;
@@ -108,7 +114,7 @@ window.onload = function(){
 				if (move % 3 == 0) {
 					ghostArray[name].updateInformation();
 				}
-				ghostArray[name].moveGhosts(POS[X], POS[Y]);
+				ghostArray[name].moveGhosts(POS[X], POS[Y], player);
 			}
 		}
 

@@ -22,6 +22,7 @@ function Player(fineX, fineY, X, Y, frame, dir){
 	this.ImgFrame = frame;
 	this.direction = dir;
 	this.moving = true;
+	this.eating = 0;
 
 		//draws the pacman in their current position
 	this.drawPlayer = function(ctx) {
@@ -63,6 +64,10 @@ function Player(fineX, fineY, X, Y, frame, dir){
 				this.POSY += direction.y;
 				if (testItem >= 98){ 
 					scoreIncr += 10;
+				}
+
+				if (testItem == 98){ 
+					this.isEating = 400;
 				}
 				maze[testPOSY][testPOSX] = 90;
 				this.moving = true;

@@ -1,6 +1,16 @@
 /*
 This file handles all of the ghosts movements, animations, actions, and displays
 */
+function node(parent, x, y, f, g, h) {
+	this.parent = parent;
+	this.x = x;
+	this.y = y;
+	this.f = f;
+	this.g = g;
+	this.h = h;
+	this.child = null;
+	this.direction;
+}
 
 var ghostImages = new Image();
 ghostImages.src = "ghostSpritesheet.png";
@@ -36,7 +46,7 @@ var orange = {
 	right: [[5,101], [37,101]],
 };
 
-var edible = {
+var running = {
 	regular: [[69,165], [101,165]],
 	flashing: [[133,165], [165,165]]
 };
@@ -59,6 +69,8 @@ function Ghost(X, Y, edible, color, frame, dir){
 	this.direction = dir;
 	this.choose = "up";
 	this.pathArray;
+	this.orangeLoop = false;
+	this.orangePart = 0;
 
 
 	//draws the ghost in their current position
@@ -66,7 +78,7 @@ function Ghost(X, Y, edible, color, frame, dir){
 		var frame = this.ImgFrame;
 		var dir = this.direction;
 		if (this.isEdible == true)  {
-			this.GhostDrawer();
+			this.GhostDrawer(running["regular"][frame][0], running["regular"][frame][1], ctx);
 		} else if(this.ghostColor == "blue"){
 			this.GhostDrawer(blue[dir][frame][0], blue[dir][frame][1], ctx);
 		} else if (this.ghostColor == "red") {
@@ -91,8 +103,8 @@ function Ghost(X, Y, edible, color, frame, dir){
 		this.ImgFrame = this.ImgFrame % 2;
 	};
 
-	//moves the ghosts to their next position
-	this.moveGhosts = function(PacX, PacY) {
+		//moves the ghosts to their next position
+	this.moveGhosts = function(PacX, PacY, player) {
 		var freeSpots = this.findFree(); //find all free spots
 		var total = 0;
 		var dir = ["up", "right", "down", "left"];
@@ -100,6 +112,26 @@ function Ghost(X, Y, edible, color, frame, dir){
 			total += freeSpots[i];
 		}
 		var oppositeDir = ghostDirection[this.direction].opposed;
+
+		var nextSpot =  new node(null, 0, 0, 0, 0.0, 0.0);
+		nextSpot.direction = oppositeDir;
+
+		var newTarget = colorAI(PacX, PacY, player, this);
+		PacY = newTarget[1];
+		PacX = newTarget[0];
+
+		if (PacY == this.posY && PacX == this.posX) {
+	 		var locationFree = false;
+	 		while (!locationFree) {
+				PacX = (PacX % 18) + 1;
+				PacY = (PacY % 20) + 1;
+				if (maze[PacY][PacX] >= 89) {
+					locationFree = true;
+				} else { //the location is a wall, keep moving diagonally until a free spot is found
+					locationFree = false;
+				}
+			}	
+		} 
 
 		if (total <= 0) { //turn around
 			this.direction = oppositeDir;
@@ -109,7 +141,7 @@ function Ghost(X, Y, edible, color, frame, dir){
 			this.findPacman(PacX, PacY);
 			this.pathArray.shift(); //first element is useless
 			var nextSpot = this.pathArray.shift();
-		}
+		} 
 
 		//temp fix to stop them turning around
 		if (nextSpot.direction == oppositeDir) {
@@ -169,9 +201,6 @@ function Ghost(X, Y, edible, color, frame, dir){
 			this.finePOSY += 0;
 		}
 
-		var test1 = this.finePOSX;
-		var test2 = this.finePOSY;
-
 		//correct JS float point errors, and addition problems when 1 is divislbe by current speed.
 		if (this.finePOSX % 1 > 0.9 || this.finePOSX % 1 <= 0.1) {
 			this.finePOSX = Math.round(this.finePOSX);
@@ -193,7 +222,7 @@ function Ghost(X, Y, edible, color, frame, dir){
 		console.log("Pacman X: " + PacX);
 		console.log("Pacman Y: " + PacY);
 
-		if (Math.floor(PacX) == Math.floor(this.finePOSX) && Math.floor(PacY) == Math.floor(this.finePOSY)) {
+		if (Math.floor(PacX) == Math.floor(this.finePOSX) && Math.floor(PacY) == Math.floor(this.finePOSY) && !this.isEdible) {
 			return true;
 		} else {
 			return false;
@@ -215,11 +244,4 @@ function Ghost(X, Y, edible, color, frame, dir){
 	this.becomeEdible = function() {
 		//** TODO **//
 	};
-
-	//Gets them out of the initial box
-	this.startGhostMovement = function() {
-		//** TODO **//
-	};
-
-
 }

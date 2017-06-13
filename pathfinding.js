@@ -149,3 +149,64 @@ function reconstructPath(n1){
 	}
 	return totalPath;
 }
+
+//makes different ghosts behave differently
+function colorAI(tarX, tarY, player, ghost) {
+	if (ghost.ghostColor == "red" || ghost.ghostColor == "pink") { //straight for pacman
+		return [tarX, tarY];
+	} else if(ghost.ghostColor == "blue"){ //goes pretty far ahead of pacman
+		var test1 = (tarX + (ghostDirection[player.direction].x) * 6) % 18;
+		var test2 = (tarY + (ghostDirection[player.direction].y) * 6) % 20;
+		tarX = ((tarX + (ghostDirection[player.direction].x) * 6) % 18) //stay under 19 and above 0 
+		tarY = ((tarY + (ghostDirection[player.direction].y) * 6) % 20) //stay under 21 and above 0
+	} else if (ghost.ghostColor == "pink") { //go ahead of pacman, or the other side of the bored with overflow
+		var test1 = (tarX + (ghostDirection[player.direction].x) * 2);
+		var test2 = (tarY + (ghostDirection[player.direction].y) * 2);
+		tarX = ((tarX + (ghostDirection[player.direction].x) * 2) % 18) //stay under 19 and above 0 
+		tarY = ((tarY + (ghostDirection[player.direction].y) * 2) % 20) //stay under 21 and above 0	
+	} else if (ghost.ghostColor == "orange") { //if not close, go in circles
+		var distX = Math.abs(ghost.posX - tarX);
+		var distY = Math.abs(ghost.posY - tarY);
+		if (Math.sqrt(Math.pow(distX, 2) + Math.pow(distY, 2)) < 4) {
+			ghost.orangeLoop = false;
+			return [tarX, tarY];
+		} else if (ghost.orangeLoop) {
+			if (ghost.posX == 1 && ghost.posY == 19) {
+				ghost.orangePart += 1
+			} else  if (ghost.posX == 6 && ghost.posY == 19) {
+				ghost.orangePart += 1
+			} else  if (ghost.posX == 6 && ghost.posY == 16) {
+				ghost.orangePart += 1
+			}
+			ghost.orangePart = ghost.orangePart % 3
+
+			if (ghost.orangePart == 0) {
+				return [1, 19];
+			} else if (ghost.orangePart == 1) {
+				return [6, 19];
+			} else if (ghost.orangePart == 2) {
+				return [6, 16];
+			} else {
+				return [1, 19];
+			}
+		} else {
+			ghost.orangeLoop = true;
+			return [1, 19];
+		}
+	}
+		var locationFree = false;
+		tarX = Math.abs(tarX);
+		tarY = Math.abs(tarY);
+
+		while (!locationFree) {
+		if (maze[tarY][tarX] >= 89) {
+			locationFree = true;
+		} else { //the location is a wall, keep moving diagonally until a free spot is found
+			locationFree = false;
+			tarX = (tarX % 18) + 1;
+			tarY = (tarY % 20) + 1;
+		}
+	}
+
+	return[tarX, tarY];
+};
