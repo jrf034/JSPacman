@@ -167,7 +167,7 @@ function colorAI(tarX, tarY, player, ghost) {
 	} else if (ghost.ghostColor == "orange") { //if not close, go in circles
 		var distX = Math.abs(ghost.posX - tarX);
 		var distY = Math.abs(ghost.posY - tarY);
-		if (Math.sqrt(Math.pow(distX, 2) + Math.pow(distY, 2)) < 4) {
+		if (Math.sqrt(Math.pow(distX, 2) + Math.pow(distY, 2)) < 8) {
 			ghost.orangeLoop = false;
 			return [tarX, tarY];
 		} else if (ghost.orangeLoop) {

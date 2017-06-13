@@ -144,7 +144,7 @@ function Ghost(X, Y, edible, color, frame, dir){
 		} 
 
 		//temp fix to stop them turning around
-		if (nextSpot.direction == oppositeDir) {
+		if (nextSpot.direction == oppositeDir && total > 0) {
 			var selection = 0;
 			var rand = 0;
 			var newDir;
@@ -156,10 +156,14 @@ function Ghost(X, Y, edible, color, frame, dir){
 			this.direction = newDir;
 			this.posY += ghostDirection[this.direction].y;
 			this.posX += ghostDirection[this.direction].x;
-		} else {
+		} else if (total > 0) {
 			this.direction = nextSpot.direction;
 			this.posY = nextSpot.x;
 			this.posX = nextSpot.y;
+		} else {
+			this.direction = this.direction;
+			this.posY = this.posY;
+			this.posX = this.posX;
 		}
 	};
 

@@ -68,7 +68,12 @@ window.onload = function(){
 				movePacman();
 			}
 
-			var ghostSpeed = 5;
+			var ghostSpeed = 0;
+			if (player.isEating) {
+				ghostSpeed = 5;
+			} else {
+				ghostSpeed = 5;
+			}
 
 			if (move % ghostSpeed == 0) {
 				updateGhosts();

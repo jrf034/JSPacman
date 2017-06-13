@@ -71,6 +71,18 @@ function Player(fineX, fineY, X, Y, frame, dir){
 				}
 				maze[testPOSY][testPOSX] = 90;
 				this.moving = true;
+			} else if (testItem == 77) { //entered the left tube
+				this.POSX = 17;
+				this.POSY = 9;
+				this.finePOSX = 17;
+				this.finePOSY = 9;
+				this.moving = true;
+			} else if (testItem == 76) { //entered the right tube
+				this.POSX = 1;
+				this.POSY = 9;
+				this.finePOSX = 1;
+				this.finePOSY = 9;
+				this.moving = true;
 			} else {
 				this.POSX += 0;
 				this.POSY += 0;
