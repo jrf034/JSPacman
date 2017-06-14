@@ -13,7 +13,9 @@ function node(parent, x, y, f, g, h) {
 }
 
 var ghostImages = new Image();
+var eyesImages = new Image();
 ghostImages.src = "ghostSpritesheet.png";
+eyesImages.src = "EyesSpritesheet.png";
 
 var ghostDim = 22;
 var cellDim = 24;
@@ -51,14 +53,22 @@ var running = {
 	flashing: [[133,165], [165,165]]
 };
 
+var eyes = {
+	down: [5,5],
+	up: [29,22],
+	left: [5,22],
+	right: [29,5],	
+}
+
 var ghostDirection = {
 	up: {x: 0, y: -1, name: "up", opposed: "down", id: 0},
 	down: {x: 0, y: 1, name: "down", opposed: "up", id: 2},
 	left: {x: -1, y: 0, name: "left", opposed: "right", id: 3},
-	right: {x: 1, y: 0, name: "right", opposed: "left", id: 1}
+	right: {x: 1, y: 0, name: "right", opposed: "left", id: 1},
+	still: {x: 0, y: 0, name: "still", opposed: "still", id: 4},
 };
 
-function Ghost(X, Y, edible, color, frame, dir){
+function Ghost(X, Y, edible, color, frame, dir, leave){
 	this.posX = X;
 	this.posY = Y;
 	this.finePOSX = X;
@@ -67,18 +77,22 @@ function Ghost(X, Y, edible, color, frame, dir){
 	this.ghostColor = color;
 	this.ImgFrame = frame;
 	this.direction = dir;
+	this.canLeave = leave;
 	this.choose = "up";
 	this.pathArray;
 	this.orangeLoop = false;
 	this.orangePart = 0;
+	this.isEaten = false;
 
 
 	//draws the ghost in their current position
 	this.drawGhosts = function(ctx) {
 		var frame = this.ImgFrame;
 		var dir = this.direction;
-		if (this.isEdible == true)  {
-			this.GhostDrawer(running["regular"][frame][0], running["regular"][frame][1], ctx);
+		if(this.isEaten){
+			this.eyesDrawer(eyes[dir][0], eyes[dir][1], ctx);
+		} else if (this.isEdible)  {
+			this.becomeEdible(ctx);
 		} else if(this.ghostColor == "blue"){
 			this.GhostDrawer(blue[dir][frame][0], blue[dir][frame][1], ctx);
 		} else if (this.ghostColor == "red") {
@@ -98,12 +112,21 @@ function Ghost(X, Y, edible, color, frame, dir){
 		ctx.drawImage(ghostImages, offX, offY, ghostDim, ghostDim, X*cellDim+1, Y*cellDim+1, ghostDim, ghostDim);
 	};
 
+	//helper function for drawGhosts, reduce size of function
+	this.eyesDrawer = function(offX, offY, ctx) {
+		var X = this.finePOSX;
+		var Y = this.finePOSY;
+		ctx.drawImage(eyesImages, offX, offY, ghostDim, ghostDim / 2, X*cellDim+5, Y*cellDim+1, ghostDim, ghostDim / 2);
+	};
+
+
 	this.updateInformation = function(){
 		this.ImgFrame += 1;
 		this.ImgFrame = this.ImgFrame % 2;
 	};
 
-		//moves the ghosts to their next position
+	//Horribly big method that really needs optimization
+	//moves the ghosts to their next position
 	this.moveGhosts = function(PacX, PacY, player) {
 		var freeSpots = this.findFree(); //find all free spots
 		var total = 0;
@@ -112,13 +135,31 @@ function Ghost(X, Y, edible, color, frame, dir){
 			total += freeSpots[i];
 		}
 		var oppositeDir = ghostDirection[this.direction].opposed;
+		if (this.canLeave == false) {
+			if (total == 0 && this.finePOSX == 8) {
+				this.setNextPos(oppositeDir, null);
+				return;
+			} else if (total == 0 && this.finePOSX == 10){
+				this.setNextPos(oppositeDir, null);
+				return;
+			} else {
+				this.setNextPos(this.direction, null);
+				return;
+			}
+		} else if (this.finePOSX == 9 && this.finePOSY == 9 && this.isEaten) {
+			this.isEaten = false;
+		} else if (this.isEaten) {
+			PacX = 9;
+			PacY = 9;
+		} else {
+			var newTarget = colorAI(PacX, PacY, player, this);
+			PacY = newTarget[1];
+			PacX = newTarget[0];
+		}
 
 		var nextSpot =  new node(null, 0, 0, 0, 0.0, 0.0);
 		nextSpot.direction = oppositeDir;
 
-		var newTarget = colorAI(PacX, PacY, player, this);
-		PacY = newTarget[1];
-		PacX = newTarget[0];
 
 		if (PacY == this.posY && PacX == this.posX) {
 	 		var locationFree = false;
@@ -134,9 +175,8 @@ function Ghost(X, Y, edible, color, frame, dir){
 		} 
 
 		if (total <= 0) { //turn around
-			this.direction = oppositeDir;
-			this.posY += ghostDirection[this.direction].y;
-			this.posX += ghostDirection[this.direction].x;
+			this.setNextPos(oppositeDir, null);
+			return;
 		} else if (total > 0) {
 			this.findPacman(PacX, PacY);
 			this.pathArray.shift(); //first element is useless
@@ -153,19 +193,25 @@ function Ghost(X, Y, edible, color, frame, dir){
 				selection = freeSpots[rand];
 			}
 			newDir = dir[rand];
+			this.setNextPos(newDir, null);
+		} else if (total > 0) {
+			this.setNextPos("still", nextSpot);
+		} else {
+			this.setNextPos(this.direction, null);
+		}
+	};
+
+	this.setNextPos = function(newDir, nextSpot) {
+		if (nextSpot == null) {
 			this.direction = newDir;
 			this.posY += ghostDirection[this.direction].y;
-			this.posX += ghostDirection[this.direction].x;
-		} else if (total > 0) {
+			this.posX += ghostDirection[this.direction].x;		
+		} else {
 			this.direction = nextSpot.direction;
 			this.posY = nextSpot.x;
 			this.posX = nextSpot.y;
-		} else {
-			this.direction = this.direction;
-			this.posY = this.posY;
-			this.posX = this.posX;
 		}
-	};
+	}
 
 	//finds all free spots around the ghost
 	//removes its opposed direction from the list
@@ -226,26 +272,25 @@ function Ghost(X, Y, edible, color, frame, dir){
 		console.log("Pacman X: " + PacX);
 		console.log("Pacman Y: " + PacY);
 
-		if (Math.floor(PacX) == Math.floor(this.finePOSX) && Math.floor(PacY) == Math.floor(this.finePOSY) && !this.isEdible) {
+		if (Math.floor(PacX) == Math.floor(this.finePOSX) && Math.floor(PacY) == Math.floor(this.finePOSY) && !this.isEdible && !this.isEaten) {
 			return true;
+		} else if (Math.floor(PacX) == Math.floor(this.finePOSX) && Math.floor(PacY) == Math.floor(this.finePOSY) && this.isEdible) { //got eaten
+			this.isEaten = true;
+			this.isEdible = false;
 		} else {
 			return false;
 		}
 	};
-
-	this.checkPacmanCollision = function(PacX, PacY) {
-		if (this.posX == PacX && this.posY == PacY) {
-			return true;
-		} else {
-			return false;
-		}
-	}
 
 	this.findPacman = function(PacX, PacY) {
 		this.pathArray = findPath(this.posX, this.posY, PacX, PacY, ghostDirection[this.direction].opposed);
 	}
 	//makes the ghosts edible
-	this.becomeEdible = function() {
-		//** TODO **//
+	this.becomeEdible = function(ctx) {
+		this.GhostDrawer(running["regular"][frame][0], running["regular"][frame][1], ctx);
 	};
+
+	this.setCanLeave = function(leave) {
+		this.canLeave = leave;
+	}
 }

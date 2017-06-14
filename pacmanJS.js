@@ -32,25 +32,26 @@ window.onload = function(){
 		var ctx = canvas.getContext('2d');
 		var STATUS = false;
 		var SCORE = 0;
-		var OLD_DIRECTION = VECTORS.right;
-		var direction = VECTORS.right;
+		var OLD_DIRECTION = VECTORS.left;
+		var direction = VECTORS.left;
 		var INCR = 10;
 		var SIZE = 24;
 		var REFRESH_RATE = 50;
-		var POS = [1,1];
-		var finePOS = [1.0,1.0];
+		var POS = [9, 15];
+		var finePOS = [9.0, 15.0];
         var scoreboard = document.getElementById("scoreboard");
         var highScoreboard = document.getElementById("highScore");
 		var move = 0;
 		var pacmanFrame = 0;
 		var newHighscore = false;
 		var moving = true;
+		var dots = 0;
 		
 		var player = new Player(finePOS[X], finePOS[Y], POS[X], POS[Y], pacmanFrame, OLD_DIRECTION["name"]);
-		var blinky = new Ghost(9, 7, false, "red", 1, "up");
-		var inky = new Ghost(8, 9, false, "blue", 1, "right");
-		var pinky = new Ghost(9, 9, false, "pink", 1, "up");
-		var clyde = new Ghost(10, 9, false, "orange", 1, "left");
+		var blinky = new Ghost(9, 7, false, "red", 1, "up", true);
+		var inky = new Ghost(8, 9, false, "blue", 1, "left", false);
+		var pinky = new Ghost(9, 9, false, "pink", 1, "up", true);
+		var clyde = new Ghost(10, 9, false, "orange", 1, "right", false);
 
 		var ghostArray = [blinky, inky, pinky, clyde];
 
@@ -104,7 +105,20 @@ window.onload = function(){
 				pacmanFrame = pacmanFrame % 3
 			}
 
+			dots = countDots();
+			if (dots == 0) {
+				advanceLevel();
+			} else if (dots < 75) {
+				clyde.setCanLeave(true);
+			} else if (dots < 120) {
+				inky.setCanLeave(true);
+			}
+
 			STATUS = setTimeout(function() { loop(); }, REFRESH_RATE);
+		}
+
+		function advanceLevel() {
+			//TODO//
 		}
 
 		//pass it off to the pacman class

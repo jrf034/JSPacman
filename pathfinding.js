@@ -160,10 +160,8 @@ function colorAI(tarX, tarY, player, ghost) {
 		tarX = ((tarX + (ghostDirection[player.direction].x) * 6) % 18) //stay under 19 and above 0 
 		tarY = ((tarY + (ghostDirection[player.direction].y) * 6) % 20) //stay under 21 and above 0
 	} else if (ghost.ghostColor == "pink") { //go ahead of pacman, or the other side of the bored with overflow
-		var test1 = (tarX + (ghostDirection[player.direction].x) * 2);
-		var test2 = (tarY + (ghostDirection[player.direction].y) * 2);
-		tarX = ((tarX + (ghostDirection[player.direction].x) * 2) % 18) //stay under 19 and above 0 
-		tarY = ((tarY + (ghostDirection[player.direction].y) * 2) % 20) //stay under 21 and above 0	
+		tarX = ((tarX + (ghostDirection[player.direction].x) * 3) % 18) //stay under 19 and above 0 
+		tarY = ((tarY + (ghostDirection[player.direction].y) * 3) % 20) //stay under 21 and above 0	
 	} else if (ghost.ghostColor == "orange") { //if not close, go in circles
 		var distX = Math.abs(ghost.posX - tarX);
 		var distY = Math.abs(ghost.posY - tarY);
