@@ -23,6 +23,7 @@ function Player(fineX, fineY, X, Y, frame, dir){
 	this.direction = dir;
 	this.moving = true;
 	this.eating = 0;
+	this.lives = 3;
 
 		//draws the pacman in their current position
 	this.drawPlayer = function(ctx) {

@@ -84,7 +84,6 @@ function Ghost(X, Y, edible, color, frame, dir, leave){
 	this.orangePart = 0;
 	this.isEaten = false;
 
-
 	//draws the ghost in their current position
 	this.drawGhosts = function(ctx) {
 		var frame = this.ImgFrame;
@@ -125,7 +124,17 @@ function Ghost(X, Y, edible, color, frame, dir, leave){
 		this.ImgFrame = this.ImgFrame % 2;
 	};
 
-	//Horribly big method that really needs optimization
+	this.resetPosition = function (X, Y, fX, fY, dir, leave) {
+		this.posX = X;
+		this.posY = Y;
+		this.finePOSX = fX;
+		this.finePOSY = fY;
+		this.direction = dir;
+		this.canLeave = leave;
+		this.isEaten = false;
+		this.isEdible = false;
+	};
+
 	//moves the ghosts to their next position
 	this.moveGhosts = function(PacX, PacY, player) {
 		var freeSpots = this.findFree(); //find all free spots
@@ -136,16 +145,8 @@ function Ghost(X, Y, edible, color, frame, dir, leave){
 		}
 		var oppositeDir = ghostDirection[this.direction].opposed;
 		if (this.canLeave == false) {
-			if (total == 0 && this.finePOSX == 8) {
-				this.setNextPos(oppositeDir, null);
-				return;
-			} else if (total == 0 && this.finePOSX == 10){
-				this.setNextPos(oppositeDir, null);
-				return;
-			} else {
-				this.setNextPos(this.direction, null);
-				return;
-			}
+			this.leaveTheBox(total, oppositeDir);
+			return;
 		} else if (this.finePOSX == 9 && this.finePOSY == 9 && this.isEaten) {
 			this.isEaten = false;
 		} else if (this.isEaten) {
@@ -160,25 +161,15 @@ function Ghost(X, Y, edible, color, frame, dir, leave){
 		var nextSpot =  new node(null, 0, 0, 0, 0.0, 0.0);
 		nextSpot.direction = oppositeDir;
 
-
-		if (PacY == this.posY && PacX == this.posX) {
-	 		var locationFree = false;
-	 		while (!locationFree) {
-				PacX = (PacX % 18) + 1;
-				PacY = (PacY % 20) + 1;
-				if (maze[PacY][PacX] >= 89) {
-					locationFree = true;
-				} else { //the location is a wall, keep moving diagonally until a free spot is found
-					locationFree = false;
-				}
-			}	
-		} 
+		var overlap = this.checkSelfOverlap(PacX, PacY);
+		PacY = overlap[1];
+		PacX = overlap[0];
 
 		if (total <= 0) { //turn around
 			this.setNextPos(oppositeDir, null);
 			return;
 		} else if (total > 0) {
-			this.findPacman(PacX, PacY);
+			this.pathArray = findPath(this.posX, this.posY, PacX, PacY, ghostDirection[this.direction].opposed);
 			this.pathArray.shift(); //first element is useless
 			var nextSpot = this.pathArray.shift();
 		} 
@@ -198,6 +189,35 @@ function Ghost(X, Y, edible, color, frame, dir, leave){
 			this.setNextPos("still", nextSpot);
 		} else {
 			this.setNextPos(this.direction, null);
+		}
+	};
+
+	this.checkSelfOverlap = function(PacX, PacY) {
+ 		var locationFree = false;
+		if (PacY == this.posY && PacX == this.posX) {
+	 		while (!locationFree) {
+				PacX = (PacX % 18) + 1;
+				PacY = (PacY % 20) + 1;
+				if (maze[PacY][PacX] >= 89) {
+					locationFree = true;
+				} else { //the location is a wall, keep moving diagonally until a free spot is found
+					locationFree = false;
+				}
+			}
+		}
+		return [PacX, PacY];
+	};
+
+	this.leaveTheBox = function(total, oppositeDir) {
+		if (total == 0 && this.finePOSX == 8) {
+			this.setNextPos(oppositeDir, null);
+			return;
+		} else if (total == 0 && this.finePOSX == 10){
+			this.setNextPos(oppositeDir, null);
+			return;
+		} else {
+			this.setNextPos(this.direction, null);
+			return;
 		}
 	};
 
@@ -251,30 +271,22 @@ function Ghost(X, Y, edible, color, frame, dir, leave){
 			this.finePOSY += 0;
 		}
 
-		//correct JS float point errors, and addition problems when 1 is divislbe by current speed.
+		//correct JS float point errors, and addition problems when 1 is divisible by current speed.
 		if (this.finePOSX % 1 > 0.9 || this.finePOSX % 1 <= 0.1) {
 			this.finePOSX = Math.round(this.finePOSX);
 		} else {
 			this.finePOSX = Math.round(this.finePOSX * 100) / 100;
 		}
 
-		if (this.finePOSY % 1> 0.9 || this.finePOSY % 1 <= 0.1) {
+		if (this.finePOSY % 1 > 0.9 || this.finePOSY % 1 <= 0.1) {
 			this.finePOSY = Math.round(this.finePOSY);
 		} else {
 			this.finePOSY = Math.round(this.finePOSY * 100) / 100;
 		}
 
-		var test3 = this.finePOSX;
-		var test4 = this.finePOSY;
-
-		console.log(this.ghostColor + " Ghost X: " + this.finePOSX);
-		console.log(this.ghostColor + "Ghost Y: " + this.finePOSY);
-		console.log("Pacman X: " + PacX);
-		console.log("Pacman Y: " + PacY);
-
 		if (Math.floor(PacX) == Math.floor(this.finePOSX) && Math.floor(PacY) == Math.floor(this.finePOSY) && !this.isEdible && !this.isEaten) {
 			return true;
-		} else if (Math.floor(PacX) == Math.floor(this.finePOSX) && Math.floor(PacY) == Math.floor(this.finePOSY) && this.isEdible) { //got eaten
+		} else if (Math.abs(this.finePOSX - PacX) < 1 && Math.abs(this.finePOSY - PacY) < 1 && this.isEdible) { //got eaten
 			this.isEaten = true;
 			this.isEdible = false;
 		} else {
@@ -282,9 +294,6 @@ function Ghost(X, Y, edible, color, frame, dir, leave){
 		}
 	};
 
-	this.findPacman = function(PacX, PacY) {
-		this.pathArray = findPath(this.posX, this.posY, PacX, PacY, ghostDirection[this.direction].opposed);
-	}
 	//makes the ghosts edible
 	this.becomeEdible = function(ctx) {
 		this.GhostDrawer(running["regular"][frame][0], running["regular"][frame][1], ctx);

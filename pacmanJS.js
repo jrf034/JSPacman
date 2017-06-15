@@ -41,11 +41,14 @@ window.onload = function(){
 		var finePOS = [9.0, 15.0];
         var scoreboard = document.getElementById("scoreboard");
         var highScoreboard = document.getElementById("highScore");
+        var levelCntr = document.getElementById("Level");
+        var livesCntr = document.getElementById("Lives");
 		var move = 0;
 		var pacmanFrame = 0;
 		var newHighscore = false;
 		var moving = true;
 		var dots = 0;
+		var level = 1;
 		
 		var player = new Player(finePOS[X], finePOS[Y], POS[X], POS[Y], pacmanFrame, OLD_DIRECTION["name"]);
 		var blinky = new Ghost(9, 7, false, "red", 1, "up", true);
@@ -87,15 +90,20 @@ window.onload = function(){
 			updateScore();
 			for (var name in ghostArray) {
 				var test = ghostArray[name].updateFinePos(finePOS[X], finePOS[Y], ghostSpeed);
-				if (test) {
+				if (test && player.lives <= 1) {
 					gameOver();
+				} else  if (test) {
+					player.lives -= 1;
+					resetLevel(true);
 				}
 				ghostArray[name].drawGhosts(ctx);
-				if (player.isEating > 0) {
+				if (player.isEating > 396) {
 					player.isEating -= 1;
 					ghostArray[name].isEdible = true;
-				} else {
+				} else if (player.isEating < 2 || ghostArray[name].isEaten) {
 					ghostArray[name].isEdible = false;
+				} else {
+					player.isEating -= 1;
 				}
 			}
 
@@ -104,21 +112,43 @@ window.onload = function(){
 				pacmanFrame++;
 				pacmanFrame = pacmanFrame % 3
 			}
+			//151 total dots
+			var orange = 151 - (Math.floor(100 / level));
+			var blue = 151 - (Math.floor(30 / level));
 
 			dots = countDots();
-			if (dots == 0) {
-				advanceLevel();
-			} else if (dots < 75) {
+			if (dots <= 0) {
+				resetLevel(false);
+			} else if (dots < orange) {
 				clyde.setCanLeave(true);
-			} else if (dots < 120) {
+			} else if (dots < blue) {
 				inky.setCanLeave(true);
 			}
 
 			STATUS = setTimeout(function() { loop(); }, REFRESH_RATE);
 		}
 
-		function advanceLevel() {
-			//TODO//
+		//move to the next level
+		function resetLevel(died) {
+			if (died) {
+				livesCntr.innerHTML = player.lives;
+			} else {
+				maze = JSON.parse(resetMaze);
+				drawMaze(ctx);
+				level++;
+				levelCntr.innerHTML = level;
+			}
+			POS = [9, 15];
+			finePOS = [9.0, 15.0];
+			pacmanFrame = 0;
+			direction = VECTORS.left;
+			OLD_DIRECTION = VECTORS.left;
+			player.updateInformation(9.0, 15.0, 9, 15, 0, "left")		
+			blinky.resetPosition(9, 7, 9.0, 7.0, "up", true);
+			inky.resetPosition(8, 9, 8.0, 9.0, "left", false);
+			pinky.resetPosition(9, 9, 9.0, 9.0, "up", true);
+			clyde.resetPosition(10, 9, 10.0, 9.0, "right", false);
+			wait(1000)
 		}
 
 		//pass it off to the pacman class
@@ -148,6 +178,7 @@ window.onload = function(){
 		//update the scoreboard
 		function updateScore() {
 			scoreboard.innerHTML = SCORE;
+			livesCntr.innerHTML = player.lives;
 			var setHighScore = localStorage.getItem("pacmanHighscore");
 			if (setHighScore == null){
 				highScoreboard.innerHTML = 0;
@@ -187,6 +218,14 @@ window.onload = function(){
 		//Reload the webpage
 		function restart() {
 			location.reload();
+		}
+
+		function wait(ms) {
+			var d = new Date();
+			var d2 = null;
+			do { 
+				d2 = new Date(); 
+			} while(d2-d < ms);
 		}
 
 		//End the game

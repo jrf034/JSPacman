@@ -185,8 +185,9 @@ body {
     position: absolute;
     right: 0px;
     top: 0px;
-    width: 200px;
-    height: 200px;
+    width: auto;
+    height: auto;
+    padding: 5px;
 	background: #445739;
 	border: 2px solid #000000;
 	text-align: center;
